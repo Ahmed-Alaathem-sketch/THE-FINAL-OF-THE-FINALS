@@ -45,7 +45,7 @@ function readHeaderFields(lines: string[]): { fields: HeaderFields; consumed: Se
   return { fields, consumed };
 }
 
-const ABBREV_END = /(?:\b(?:Co|Ltd|No|Mr|Mrs|Ms|Dr|St|vs|etc|approx|e\.g|i\.e|W\.L\.L|L\.L\.C)\.|\b[A-Z]\.)$/;
+const ABBREV_END = /(?:\b(?:Co|Ltd|No|Mr|Mrs|Ms|Dr|St|vs|etc|approx|e\.g|i\.e|W\.L\.L|L\.L\.C)\.)$/;
 
 /** Split a body into sentences with offsets. Deterministic, abbreviation-aware. */
 export function splitSentences(body: string): Sentence[] {

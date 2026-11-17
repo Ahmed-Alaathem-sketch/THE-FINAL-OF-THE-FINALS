@@ -50,3 +50,9 @@ describe('memo parser', () => {
     expect(parts[0]).toMatch(/^# MEMO-01/);
   });
 });
+
+describe('sentence splitting regression', () => {
+  it('splits after a single capital letter that ends a sentence', () => {
+    expect(splitSentences('Supply moved to Plant B. Indemnity is capped at BHD 10,000.').map((s) => s.text)).toEqual(['Supply moved to Plant B.', 'Indemnity is capped at BHD 10,000.']);
+  });
+});

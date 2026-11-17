@@ -34,8 +34,9 @@ export default function Rules() {
 
   function startDraft() {
     const v = newVersion.trim();
-    if (sets.some((r) => r.id === sel.id && r.version === v)) { toast(`Version ${v} already exists.`, 'err'); return; }
-    const d = createDraft(sel, v, `${sel.id} V${v} draft`, new Date().toISOString());
+    if (sets.some((r) => r.id === view.id && r.version === v) || (draft && draft.version === v)) { toast(`Version ${v} already exists.`, 'err'); return; }
+    const base = editing ?? sel; // an unsaved draft is a valid base too
+    const d = createDraft(base, v, `${base.id} V${v} draft`, new Date().toISOString());
     setDraft(d);
     setSelKey(ruleKey(d));
     setSandbox(null);

@@ -27,12 +27,12 @@ export default function SupplierProfile() {
     if (tab !== 'History') return;
     let live = true;
     (async () => {
-      const list = [];
-      for (const r of runs.slice(-25)) {
-        const run = await loadRun(r.id);
-        const row = run?.output.scorecard.find((x) => x.supplierId === id);
-        if (row) list.push({ id: r.id, at: r.createdAt, status: row.status, fp: r.outputFingerprint, rule: r.ruleSetKey, reason: r.reason });
-      }
+      const recent = runs.slice(-25);
+      const loaded = await Promise.all(recent.map((r) => loadRun(r.id)));
+      const list = recent.flatMap((r, i) => {
+        const row = loaded[i]?.output.scorecard.find((x) => x.supplierId === id);
+        return row ? [{ id: r.id, at: r.createdAt, status: row.status, fp: r.outputFingerprint, rule: r.ruleSetKey, reason: r.reason }] : [];
+      });
       if (live) setHistory(list.reverse());
     })();
     return () => { live = false; };

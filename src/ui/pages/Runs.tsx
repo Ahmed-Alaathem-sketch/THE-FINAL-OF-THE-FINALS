@@ -14,7 +14,7 @@ export default function Runs() {
   const a = sp.get('a') ?? (runs.length > 1 ? runs[runs.length - 2]!.id : '');
   const b = sp.get('b') ?? (runs.length ? runs[runs.length - 1]!.id : '');
   const [pair, setPair] = useState<[StoredRun, StoredRun] | null>(null);
-  const [reassessKey, setReassessKey] = useState(st.activeRuleKey);
+  const [picked, setPicked] = useState<string | null>(null);
   useEffect(() => {
     let live = true;
     if (a && b) Promise.all([loadRun(a), loadRun(b)]).then(([x, y]) => { if (live && x && y) setPair([x, y]); });
@@ -22,6 +22,9 @@ export default function Runs() {
   }, [a, b, loadRun]);
   const diff = pair ? diffRuns(pair[0].output, pair[1].output) : null;
   const runnable = allRuleSets(st).filter((r) => r.lifecycle !== 'EXPERIMENTAL');
+  // Default to the currently active version; a stale choice that no longer exists falls back to it.
+  const reassessKey = picked && runnable.some((r) => ruleKey(r) === picked) ? picked : st.activeRuleKey;
+  const setReassessKey = setPicked;
 
   return (
     <div className="stack">

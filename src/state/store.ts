@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { appendAudit, addDecision, addRun, clearAll, getDataset, getMeta, getRun, listAudit, listDatasets, listDecisions, listRuleSets, listRunIndex, newId, putDataset, putRuleSet, ruleKey, setMeta, type Dataset, type RunIndex, type StoredRun } from '../storage/db';
 import { verifyChain, type ChainCheck } from '../audit/audit';
 import { assess, loadMemos } from '../engine/assess';
+import { parseLog, parseMaster } from '../engine/parse/records';
 import type { ReviewDecision } from '../engine/decisions';
 import { RR_C5_V1_2 } from '../engine/rules/rr-c5-v1.2';
 import { approvalPhrase, conflictsWith, validateRuleSet } from '../engine/rules/manage';
@@ -97,8 +98,10 @@ export const useStore = create<State & Actions>((set, get) => {
 
     async importDataset(files, label) {
       const ds: Dataset = { id: newId('DS'), createdAt: now(), label, master: files.master, log: files.log, memos: files.memos, parentId: get().dataset?.id ?? null };
-      // Validate by running the engine before storing anything.
-      assess({ ...files, ruleSet: findRuleSet(get(), get().activeRuleKey) ?? (RR_C5_V1_2 as RuleSet), decisions: get().decisions });
+      // Validate the sources (parse only) before storing anything; the assessment itself runs once below.
+      parseMaster(files.master.text, files.master.name);
+      parseLog(files.log.text, files.log.name);
+      loadMemos(files.memos);
       await putDataset(ds);
       await setMeta('activeDatasetId', ds.id);
       set({ dataset: ds, datasets: [...get().datasets, ds], memos: loadMemos(ds.memos).memos });
@@ -138,7 +141,7 @@ export const useStore = create<State & Actions>((set, get) => {
       const rs = findRuleSet(get(), key);
       if (!rs) throw new Error(`Rule set ${key} not found.`);
       if (rs.lifecycle === 'EXPERIMENTAL') throw new Error('Experimental (unapproved) rule versions can only be run in the sandbox.');
-      set({ busy: 'Running assessment…' });
+      set({ busy: 'Running assessment…', error: null });
       try {
         const output = assess({ master: dataset.master, log: dataset.log, memos: dataset.memos, ruleSet: rs, decisions });
         const run: StoredRun = { id: newId('RUN'), createdAt: now(), actor: get().actor, reason, datasetId: dataset.id, ruleSetKey: key, decisionIds: decisions.map((d) => d.id), output };
@@ -214,7 +217,7 @@ export const useStore = create<State & Actions>((set, get) => {
 
     async wipe() {
       await clearAll();
-      set({ dataset: null, datasets: [], memos: [], decisions: [], ruleSets: [], activeRuleKey: BASELINE_KEY, runs: [], current: null, audit: { count: 0, check: { ok: true, checked: 0 } } });
+      set({ actor: 'Anonymous reviewer', dataset: null, datasets: [], memos: [], decisions: [], ruleSets: [], activeRuleKey: BASELINE_KEY, runs: [], current: null, audit: { count: 0, check: { ok: true, checked: 0 } } });
     },
   };
 });
