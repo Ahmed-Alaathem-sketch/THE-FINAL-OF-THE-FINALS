@@ -14,12 +14,13 @@ export function Donut({ slices, total, label }: { slices: Slice[]; total: number
     <div className="row" style={{ alignItems: 'center', gap: 24 }}>
       <svg className="chart" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label={`${label}: ${slices.map((s) => `${s.label} ${s.value}`).join(', ')}`}>
         <circle cx="100" cy="100" r={R} fill="none" stroke="#EED7A6" strokeWidth="26" />
+        <g transform="rotate(-90 100 100)">
         {slices.filter((s) => s.value > 0).map((s) => {
           const len = total ? (s.value / total) * C : 0;
           const el = (
             <circle
               key={s.key} className="seg" cx="100" cy="100" r={R} fill="none" stroke={s.color} strokeWidth="26"
-              strokeDasharray={`${Math.max(len - 2, 0.5)} ${C}`} strokeDashoffset={-acc} transform="rotate(-90 100 100)"
+              strokeDasharray={`${Math.max(len - 2, 0.5)} ${C}`} strokeDashoffset={-acc}
               tabIndex={0} role="link" aria-label={`${s.label}: ${s.value} — open list`}
               onClick={() => nav(s.to)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nav(s.to); } }}
             >
@@ -29,6 +30,7 @@ export function Donut({ slices, total, label }: { slices: Slice[]; total: number
           acc += len;
           return el;
         })}
+        </g>
         <text x="100" y="96" textAnchor="middle" style={{ fontSize: 34, fontWeight: 750 }}>{total}</text>
         <text x="100" y="120" textAnchor="middle" style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase' }}>{label}</text>
       </svg>

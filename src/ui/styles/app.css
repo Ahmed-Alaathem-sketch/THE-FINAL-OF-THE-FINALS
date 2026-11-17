@@ -26,7 +26,7 @@
 
   --st-red: #b42318;
   --st-red-bg: #fbe4e1;
-  --st-amber: #b25e09;
+  --st-amber: #9a4f06;
   --st-amber-bg: #fdecc8;
   --st-green: #2a6e45;
   --st-green-bg: #dcefe2;
@@ -129,7 +129,7 @@ hr { border: 0; border-top: 1px solid var(--sand-400); margin: 1.5rem 0; }
 }
 .topbar .crumbs { font-size: 0.86rem; color: var(--ink-500); }
 .topbar .spacer { flex: 1; }
-.menu-btn { display: none; }
+.btn.menu-btn { display: none; }
 .content { padding: clamp(18px, 3vw, 40px); max-width: 1440px; width: 100%; }
 
 .chip-run { display: inline-flex; gap: 8px; align-items: center; font-size: 0.78rem; background: var(--sand-50); border: 1px solid var(--sand-400); border-radius: 999px; padding: 4px 12px; color: var(--ink-700); }
@@ -390,7 +390,7 @@ mark.hl.focus { background: var(--brass); outline: 2px solid var(--ink); border-
   .sidebar { position: fixed; inset: 0 auto 0 0; width: min(86vw, 320px); z-index: 70; transform: translateX(-105%); transition: transform var(--t-med) var(--ease); box-shadow: var(--shadow-2); }
   .sidebar.open { transform: none; }
   .scrim { position: fixed; inset: 0; background: rgba(28, 57, 63, 0.45); z-index: 60; }
-  .menu-btn { display: inline-flex; }
+  .btn.menu-btn { display: inline-flex; }
   .g-2, .g-3 { grid-template-columns: 1fr; }
   .hero { grid-template-columns: 1fr; }
   .radar { max-width: 280px; }
@@ -427,4 +427,9 @@ mark.hl.focus { background: var(--brass); outline: 2px solid var(--ink); border-
   .shell { display: block; }
   body { background: #fff; }
   .card { box-shadow: none; break-inside: avoid; }
+  .reveal { opacity: 1; transform: none; }
 }
+
+/* "no flag" chips on dark cards */
+.card.ink .flag.off { color: #e6d7b6; border-color: rgba(248, 230, 194, 0.55); }
+.card.ink .flag:not(.off):not(.und) { background: var(--brass); color: var(--ink); border-color: var(--brass-600); }

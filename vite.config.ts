@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { brandFonts } from './scripts/brand-fonts';
+import { brandFonts } from './scripts/brand-fonts.ts';
 
 // Static SPA for Cloudflare Pages. No server code, no environment secrets.
 export default defineConfig({

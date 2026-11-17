@@ -33,7 +33,7 @@ export default function Memos() {
       {tab === 'list' && (
         <div className="card">
           <div className="filters" style={{ gridTemplateColumns: '2fr 1fr' }} role="search">
-            <div className="field"><label htmlFor="m-q">Search memo content</label><input id="m-q" className="input" value={q} placeholder="e.g. indemnity, requalification, Marrowgate" onChange={(e) => set('q', e.target.value)} /></div>
+            <div className="field"><label htmlFor="m-q">Search memo content</label><input id="m-q" className="input" value={q} placeholder="e.g. indemnity, requalification, supplier name" onChange={(e) => set('q', e.target.value)} /></div>
             <div className="field"><label htmlFor="m-m">Match</label>
               <select id="m-m" className="input" value={match} onChange={(e) => set('match', e.target.value)}>
                 <option value="">All</option><option value="matched">Matched</option><option value="unmatched">CANNOT DETERMINE (MATCH)</option>

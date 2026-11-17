@@ -9,6 +9,7 @@ import { toast } from '../components/Toast';
 export default function Runs() {
   const runs = useStore((s) => s.runs);
   const st = useStore();
+  const loadRun = useStore((s) => s.loadRun);
   const [sp, setSp] = useSearchParams();
   const a = sp.get('a') ?? (runs.length > 1 ? runs[runs.length - 2]!.id : '');
   const b = sp.get('b') ?? (runs.length ? runs[runs.length - 1]!.id : '');
@@ -16,9 +17,9 @@ export default function Runs() {
   const [reassessKey, setReassessKey] = useState(st.activeRuleKey);
   useEffect(() => {
     let live = true;
-    if (a && b) Promise.all([st.loadRun(a), st.loadRun(b)]).then(([x, y]) => { if (live && x && y) setPair([x, y]); });
+    if (a && b) Promise.all([loadRun(a), loadRun(b)]).then(([x, y]) => { if (live && x && y) setPair([x, y]); });
     return () => { live = false; };
-  }, [a, b, st]);
+  }, [a, b, loadRun]);
   const diff = pair ? diffRuns(pair[0].output, pair[1].output) : null;
   const runnable = allRuleSets(st).filter((r) => r.lifecycle !== 'EXPERIMENTAL');
 
