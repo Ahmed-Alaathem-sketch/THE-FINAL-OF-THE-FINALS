@@ -4,7 +4,7 @@ import { parseLog, parseMaster } from '../../src/engine/parse/records';
 
 describe('CSV parser', () => {
   it('handles quotes, escaped quotes, CRLF and BOM with physical line numbers', () => {
-    const t = parseCsv('﻿a,b\r\n"x, y","He said ""hi"""\r\n1,2\r\n');
+    const t = parseCsv('\uFEFFa,b\r\n"x, y","He said ""hi"""\r\n1,2\r\n');
     expect(t.headers).toEqual(['a', 'b']);
     expect(t.rows[0]!.values).toEqual(['x, y', 'He said "hi"']);
     expect(t.rows[1]!.lineNumber).toBe(3);

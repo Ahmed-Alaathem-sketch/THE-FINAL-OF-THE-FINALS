@@ -56,7 +56,7 @@ export function splitSentences(body: string): Sentence[] {
     const para = pm[0];
     const base = pm.index;
     let start = 0;
-    const boundary = /([.!?])(["')\]]?)(\s+)(?=["'(\[]?[A-Z0-9])/g;
+    const boundary = /([.!?])(["')\]]?)(\s+)(?=["'([]?[A-Z0-9])/g;
     let bm: RegExpExecArray | null;
     while ((bm = boundary.exec(para))) {
       const endIdx = bm.index + bm[1]!.length + bm[2]!.length;
@@ -81,7 +81,7 @@ function pushSentence(out: Sentence[], para: string, base: number, s: number, e:
 export interface ParsedMemoInput { text: string; fileName: string; overrides?: Partial<{ memoId: string; date: string; supplierAsWritten: string; author: string; title: string }> }
 
 export function parseMemo({ text, fileName, overrides }: ParsedMemoInput): Memo {
-  const normalized = text.replace(/^﻿/, '').replace(/\r\n?/g, '\n');
+  const normalized = text.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
   const lines = normalized.split('\n');
   const warnings: string[] = [];
 

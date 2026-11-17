@@ -15,7 +15,7 @@ export class CsvError extends Error {
 }
 
 export function parseCsv(text: string): CsvTable {
-  const src = text.replace(/^﻿/, '');
+  const src = text.replace(/^\uFEFF/, '');
   const records: { lineNumber: number; values: string[] }[] = [];
   let field = '';
   let row: string[] = [];

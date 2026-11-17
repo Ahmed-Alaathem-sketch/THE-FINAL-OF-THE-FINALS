@@ -466,7 +466,9 @@ export function assess(input: AssessmentInput): AssessmentOutput {
   });
   const body = {
     engineVersion: ENGINE_VERSION, ruleSetId: rs.id, ruleSetVersion: rs.version, ruleSetHash, asOf, inputFingerprint,
-    scorecard, coverage, coverageRecord, families, matches, statements, contradictions,
+    scorecard, coverage, coverageRecord, families,
+    memos: memos.map((m) => ({ memoId: m.memoId, title: m.title, date: m.date, author: m.author, supplierAsWritten: m.supplierAsWritten, fileName: m.fileName, sha256: m.sha256, duplicateFiles: m.duplicateFiles, sentenceCount: m.sentences.length, warnings: m.warnings, conflicting: conflictIds.has(m.memoId) })),
+    matches, statements, contradictions,
     reviewQueue: reviewQueue.sort((a, b) => a.key.localeCompare(b.key)), summary, warnings,
   };
   return { ...body, outputFingerprint: sha256(canonicalJson(body)) };

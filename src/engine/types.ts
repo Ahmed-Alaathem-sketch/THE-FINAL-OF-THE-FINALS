@@ -303,6 +303,20 @@ export interface RunSummary {
   suppliersWithoutMemo: number;
 }
 
+export interface MemoMeta {
+  memoId: string;
+  title: string;
+  date: string;
+  author: string;
+  supplierAsWritten: string;
+  fileName: string;
+  sha256: string;
+  duplicateFiles: string[];
+  sentenceCount: number;
+  warnings: string[];
+  conflicting: boolean;
+}
+
 export interface AssessmentOutput {
   engineVersion: string;
   ruleSetId: string;
@@ -315,6 +329,7 @@ export interface AssessmentOutput {
   coverage: CoverageRow[];
   coverageRecord: CoverageRecord;
   families: FamilyResult[];
+  memos: MemoMeta[];
   matches: MemoMatch[];
   statements: Statement[];
   contradictions: Contradiction[];

@@ -5,10 +5,10 @@ import { parseMemo } from '../../src/engine/parse/memo';
 import { RR_C5_V1_2 } from '../../src/engine/rules/rr-c5-v1.2';
 import { allFactCombinations, decide } from '../../src/engine/rules/ruleset';
 import { FLAG_NAMES } from '../../src/engine/types';
-import { logCsv, masterCsv, memoFile } from '../helpers/build';
+import { logCsv, masterCsv, memoFile, type MiniSupplier } from '../helpers/build';
 
 const RS = RR_C5_V1_2;
-const base = [
+const base: MiniSupplier[] = [
   { id: 'SUP-01', name: 'Alpha Pumps W.L.L.', families: 'widgets' },
   { id: 'SUP-02', name: 'Beta Parts Co.', families: 'widgets; gizmos' },
 ];
