@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`RR-C5 V1.2 on the official pack (26 suppliers, 23 log rows, 24 memos) > pins the immutable baseline 1`] = `"57d464ef2cca3ad5b48f25615e5c9349e5d907462e0435592cbc500a288d5ae4"`;
