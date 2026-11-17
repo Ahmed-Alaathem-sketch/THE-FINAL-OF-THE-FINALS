@@ -25,6 +25,7 @@ export default function Data() {
   const [report, setReport] = useState<ImportReport | null>(null);
   const [label, setLabel] = useState('C5 pack V1.2');
   const [confirmWipe, setConfirmWipe] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
   const [name, setName] = useState(st.actor);
   const font = useFontStatus();
 
@@ -50,6 +51,17 @@ export default function Data() {
     } catch (e) { toast((e as Error).message, 'err'); }
   }
   const ready = !!report?.master && !!report?.log;
+  const hasImported = !!st.dataset;
+  // Reset clears staged (not yet imported) files and any imported data, returning the app to its first-visit state.
+  async function reset() {
+    try {
+      if (hasImported) await st.resetImportedData();
+      setReport(null);
+      setLabel('C5 pack V1.2');
+      setConfirmReset(false);
+      toast(hasImported ? 'Reset complete: imported data cleared. You can import a new file.' : 'Selected files cleared.');
+    } catch (e) { toast((e as Error).message, 'err'); }
+  }
   const memoCount = report ? new Set(report.memos.flatMap((m) => (m.text.match(/^#{0,3}\s*(MEMO-\d+)/gm) ?? []).map((x) => x.replace(/^#+\s*/, '')))).size : 0;
 
   return (
@@ -60,6 +72,10 @@ export default function Data() {
           <h2>Import source files</h2>
           <p className="muted">Drop the pack zip (nested zips are opened), or SUPPLIER_MASTER.csv, ASSESSMENT_LOG.csv and memo files (.md, .txt, .pdf, .docx). Batch files and single memo files may both be present: identical copies are recorded once.</p>
           <FileDrop label="Drop files or select them" hint="zip · csv · md · txt · pdf · docx — max 10 MB each" accept=".zip,.csv,.md,.txt,.pdf,.docx" onFiles={onFiles} testId="import-files" />
+          <div className="btn-row" style={{ marginTop: 12 }}>
+            <button className="btn ghost sm" data-testid="reset-import" disabled={!hasImported && !report} title={!hasImported && !report ? 'Nothing imported yet' : undefined} onClick={() => (hasImported ? setConfirmReset(true) : reset())}>Reset</button>
+            <span className="muted" style={{ fontSize: '.84rem' }}>Clears the imported files and their results so you can start again.</span>
+          </div>
           {report && (
             <div className="stack" style={{ marginTop: 16 }} data-testid="import-report">
               <dl className="kv">
@@ -118,6 +134,12 @@ export default function Data() {
         <p>Brand font: <strong data-testid="font-status">{font === 'checking' ? 'checking…' : font === 'loaded' ? 'loaded' : 'not loaded — font file missing from public/fonts'}</strong></p>
         <div className="btn-row"><button className="btn danger sm" onClick={() => setConfirmWipe(true)}>Delete all local data</button></div>
       </div>
+      {confirmReset && (
+        <Dialog title="Reset imported data?" onClose={() => setConfirmReset(false)}>
+          <p>This removes the imported files and everything produced from them in this browser: the scorecard, {st.runs.length} assessment run(s) and {st.decisions.length} review decision(s). Rule versions, your display name and the audit trail are kept. Export any report you need first.</p>
+          <div className="btn-row"><button className="btn danger" onClick={reset}>Reset</button><button className="btn ghost" onClick={() => setConfirmReset(false)}>Cancel</button></div>
+        </Dialog>
+      )}
       {confirmWipe && (
         <Dialog title="Delete all local data?" onClose={() => setConfirmWipe(false)}>
           <p>This permanently deletes every dataset, run, review decision, rule draft and the audit trail stored in this browser. Export anything you need first.</p>

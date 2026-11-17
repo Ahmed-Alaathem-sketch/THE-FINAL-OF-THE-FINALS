@@ -147,6 +147,23 @@ export async function clearAll(): Promise<void> {
   await tx.done;
 }
 
+/**
+ * Remove everything an import produced: datasets, assessment runs, review decisions (they refer to
+ * imported memos) and the "current" pointers. Rule versions, the display name and the audit trail are kept.
+ */
+export async function clearImportedData(): Promise<void> {
+  const d = await db();
+  const tx = d.transaction(['datasets', 'runs', 'decisions', 'meta'], 'readwrite');
+  await Promise.all([
+    tx.objectStore('datasets').clear(),
+    tx.objectStore('runs').clear(),
+    tx.objectStore('decisions').clear(),
+    tx.objectStore('meta').delete('activeDatasetId'),
+    tx.objectStore('meta').delete('currentRunId'),
+  ]);
+  await tx.done;
+}
+
 export function newId(prefix: string): string {
   const rnd = crypto.getRandomValues(new Uint8Array(6));
   return `${prefix}-${Date.now().toString(36).toUpperCase()}-${Array.from(rnd, (b) => b.toString(16).padStart(2, '0')).join('').toUpperCase()}`;
