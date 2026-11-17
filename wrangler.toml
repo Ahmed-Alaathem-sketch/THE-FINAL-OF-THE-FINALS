@@ -1,0 +1,5 @@
+# Cloudflare Pages configuration (static site, Free plan).
+# No Workers functions, no D1, no R2, no KV: all data stays in the visitor's browser (IndexedDB).
+name = "c5-risk-control-tower"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-11-01"
