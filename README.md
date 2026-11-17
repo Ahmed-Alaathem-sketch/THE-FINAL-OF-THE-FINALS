@@ -160,7 +160,7 @@ RR-C5 V1.2 is deep-frozen and its content hash is pinned by a snapshot test.
   - 10 MB per file and 60 MB uncompressed per import.
   - At most 2,000 zip entries and 3 levels of zip nesting.
   - PDFs are read for text only (no scripting or rendering).
-- **Headers:** `public/_headers` sets a strict Content-Security-Policy (`script-src 'self'`), `X-Frame-Options: DENY`, `nosniff`, `no-referrer`, `noindex` and a restrictive Permissions-Policy.
+- **Headers:** `public/_headers` (served by Cloudflare) sets a strict Content-Security-Policy (`script-src 'self'`), `X-Frame-Options: DENY`, `nosniff`, `no-referrer`, `noindex` and a restrictive Permissions-Policy.
 - **The official pack zip in this repository is public**, because the repository is public. The app neither needs it nor deploys it; tests read it in place.
 
 ## Brand font
@@ -193,52 +193,63 @@ npm run audit:prod   # npm audit, fails on high/critical
 npm run check:font   # release gate: brand font present
 ```
 
-To test exactly as Cloudflare serves the site, including the `_headers` CSP and the `_redirects` SPA fallback, run:
+To test exactly as Cloudflare serves the site, including the `_headers` CSP and the single-page-app fallback, run:
 
 ```bash
-npm run build && npx wrangler pages dev dist --port 8788
+npx wrangler dev --port 8787
 ```
 
 ```bash
-E2E_BASE_URL=http://127.0.0.1:8788 npx playwright test --trace off
+E2E_BASE_URL=http://127.0.0.1:8787 npx playwright test --trace off
 ```
 
 The same variable can point the suite at the deployed URL.
 
-## Deployment — Cloudflare Pages (Free plan) via GitHub
+## Deployment — Cloudflare (Free plan) via GitHub
 
-The app is a static site, so it needs **no Workers, D1, R2 or KV, no environment variables and no bindings**. `wrangler.toml` declares only `pages_build_output_dir = "dist"`.
+The app is static: it needs **no Worker code, D1, R2 or KV, no environment variables and no secrets**. `wrangler.toml` serves `./dist` as **Workers static assets**, with `not_found_handling = "single-page-application"` so that deep links such as `/suppliers/SUP-09` work. It also declares a build step (`npm ci && npm run build`), so `npx wrangler deploy` always builds before uploading. `public/_headers` (CSP and security headers) is applied by Cloudflare.
 
-### One-time connection (dashboard)
-1. In Cloudflare, go to **Workers & Pages → Create → Pages → Connect to Git**, and authorise the Cloudflare GitHub app for `Ahmed-Alaathem-sketch/THE-FINAL-OF-THE-FINALS`.
-2. Use these build settings:
-   - Project name: `c5-risk-control-tower`.
+### Connected to GitHub (Workers Builds) — recommended
+1. **Merge the app into `main` first.** Cloudflare builds the production branch; before PR #1 was merged, `main` held only the README and zips, so there was nothing to build.
+2. Go to Cloudflare → **Workers & Pages → Create → Import a repository**, and choose `Ahmed-Alaathem-sketch/THE-FINAL-OF-THE-FINALS`.
+3. Use these settings:
+   - Project name: `the-final-of-the-finals`. It must match `name` in `wrangler.toml`.
    - Production branch: `main`.
-   - Framework preset: *None*.
-   - Build command: `npm run build`.
-   - Build output directory: `dist`.
-3. Set the environment variable `NODE_VERSION` = `22`. It is not a secret, only the build image's Node version.
-4. Save and deploy. Every push to `main` now builds and publishes production, and every other branch gets a preview URL.
+   - Build command: *empty*, or `npm run build`.
+   - Deploy command: `npx wrangler deploy`.
+   - Root directory: `/`.
+4. Every push to `main` then builds and deploys to `https://the-final-of-the-finals.<your-subdomain>.workers.dev`. Non-production branches can get preview versions through the project's branch settings.
 
-### Manual deploy (alternative)
+### Alternative: Pages project
+Use **Workers & Pages → Create → Pages → Connect to Git** with:
+- Build command: `npm run build`.
+- Output directory: `dist`.
+- Environment variable `NODE_VERSION=22`.
+
+Pages serves `index.html` for unknown paths automatically, because the build contains no `404.html`. Do **not** set a deploy command for a Pages project.
+
+### Manual deploy
 ```bash
-npm run build
+CLOUDFLARE_API_TOKEN=… npx wrangler deploy
 ```
 
-```bash
-CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… npx wrangler pages deploy dist --project-name c5-risk-control-tower --branch main
-```
+Use a token with the *Workers Scripts: Edit* permission only, and never commit it.
 
-Use a token with the *Cloudflare Pages: Edit* permission only, and never commit it. A project created this way (Direct Upload) **cannot later be switched to Git integration**, so use a different project name if you also want Git-connected builds.
+### Troubleshooting
+| Build log message | Cause | Fix |
+|---|---|---|
+| `No dependencies detected` followed by `Could not detect a directory containing static files` | The branch being built has no `package.json` or `wrangler.toml` (the app is not merged yet), or an old Pages-style `wrangler.toml` | Merge PR #1 into `main` (or build the `claude/…` branch); the current `wrangler.toml` has `[assets]` and a build command |
+| `The name in your wrangler.toml file (…) must match the name of your Worker` | The dashboard project name differs | Set `name` in `wrangler.toml` to the dashboard project name (currently `the-final-of-the-finals`) |
 
 ### Free plan limits
 
-The figures below are the commonly documented Pages Free limits. Check them against <https://developers.cloudflare.com/pages/platform/limits/> before relying on them; they could not be fetched from this build session.
+The figures below are the commonly documented Free plan limits. Check them against <https://developers.cloudflare.com/pages/platform/limits/> before relying on them; they could not be fetched from this build session.
 
 - 500 builds per month, 1 concurrent build, 20 minutes per build.
-- 20,000 files per deployment and 25 MiB per file. This build is about 3.4 MB and under 50 files; the largest asset is about 0.45 MB.
-- `_headers` up to 100 rules; `_redirects` up to 2,000 static and 100 dynamic rules (this project uses 3 and 1).
-- Static asset requests are not metered on Pages. This app has no Functions, so no Workers request quota applies.
+- Static assets: 20,000 files per version and 25 MiB per file. This build is about 3.6 MB in 43 files; the largest asset is about 0.45 MB.
+- Requests for static assets are free and not counted against the Workers Free daily request limit (100,000 per day). This app has no Worker script.
+- Builds: Workers Builds and Pages both have a monthly build-minute or build-count allowance on the Free plan.
+- `_headers`: up to 100 rules (this project uses 3).
 
 IndexedDB storage is limited by the visitor's browser quota, typically a share of free disk space. The app stores a few MB per dataset and run.
 
