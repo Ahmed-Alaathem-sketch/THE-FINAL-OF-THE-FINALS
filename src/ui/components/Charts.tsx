@@ -31,7 +31,7 @@ export function Donut({ slices, total, label }: { slices: Slice[]; total: number
           return el;
         })}
         </g>
-        <text x="100" y="96" textAnchor="middle" style={{ fontSize: 34, fontWeight: 750 }}>{total}</text>
+        <text x="100" y="96" textAnchor="middle" style={{ fontSize: 34, fontWeight: 700 }}>{total}</text>
         <text x="100" y="120" textAnchor="middle" style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase' }}>{label}</text>
       </svg>
       <div className="legend" style={{ minWidth: 200, flex: 1 }}>
@@ -70,7 +70,7 @@ export function Bars({ bars, max, label }: { bars: Bar[]; max?: number; label: s
             >
               <title>{`${b.label}: ${b.value}`}</title>
             </rect>
-            <text x={labelW + Math.max(w, 4) + 8} y={y + 20} style={{ fontSize: 13, fontWeight: 750 }}>{b.value}</text>
+            <text x={labelW + Math.max(w, 4) + 8} y={y + 20} style={{ fontSize: 13, fontWeight: 700 }}>{b.value}</text>
           </g>
         );
       })}

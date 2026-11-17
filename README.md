@@ -165,11 +165,11 @@ RR-C5 V1.2 is deep-frozen and its content hash is pinned by a snapshot test.
 
 ## Brand font
 
-Commit the project font to **`public/fonts/`** (`.woff2` preferred; `.woff`, `.ttf` and `.otf` also work). A Vite plugin (`scripts/brand-fonts.ts`) generates the `@font-face` rules for the family `Brand`, inferring weight and style from the file name. Every element uses it: headings, text, buttons, menus, tables, form controls and chart labels.
+The project font is **MADE Okine Sans** from `okine-font-family.zip`. Its six solid weights (Thin 100, Light 300, Regular 400, Medium 500, Bold 700 and Black 900) are converted to `.woff2` in **`public/fonts/`**; the Outline variants are not used. A Vite plugin (`scripts/brand-fonts.ts`) generates the `@font-face` rules for the family `Brand` from the file names. Every element uses it: headings, text, buttons, menus, tables, form controls and chart labels. The three characters `·`, `→` and `✕`, which the font lacks, fall back to the system font.
 
-- `npm run check:font` fails while no font file is present.
-- The e2e test "brand font file loads and is applied" is **skipped with an explicit BLOCKED reason** until a font file is committed.
-- **Data & privacy** shows the live font status.
+`npm run check:font` verifies the files are present. The e2e test "brand font file loads and is applied" checks that the font actually loads, and **Data & privacy** shows the live status.
+
+> **Licence warning:** the font's `Befonts-License.txt` says **"Personal Use Only"**. Serving it on a public website may need a commercial or web licence from the foundry. Confirm this before any non-personal use, or replace the files in `public/fonts/`; no code change is needed.
 
 ## Local setup
 
