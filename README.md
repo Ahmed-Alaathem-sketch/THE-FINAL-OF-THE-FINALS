@@ -60,7 +60,7 @@ A browser-based, rule-based control tower that applies **RR-C5 V1.2** exactly, k
 | Assessment history | `/runs` | Every run stored unchanged with its fingerprints; compare any two runs ("what changed"); reassess under any approved rule version |
 | Rules & versions | `/rules` | Immutable RR-C5 V1.2 baseline; drafts (EXPERIMENTAL) with editable parameters and decision rows; validation; conflict detection against the official table; sandbox test; approval gate (typed confirmation, approver, reason, conflict acknowledgement); deactivation; comparison of versions over all 12 fact combinations |
 | Audit trail | `/audit` | Append-only, SHA-256 hash-chained log: actor, time, action, reference, reason, previous and new values; chain verification |
-| Data & privacy | `/data` | Import, current data, display name, privacy explanation, brand-font status, delete all local data |
+| Data & privacy | `/data` | Import, **Reset** (clears staged files and all imported data, assessment runs and review decisions, with a confirmation dialog; rule versions, display name and audit trail are kept, and the reset is audited), current data, display name, privacy explanation, brand-font status, delete all local data |
 
 ## Architecture
 

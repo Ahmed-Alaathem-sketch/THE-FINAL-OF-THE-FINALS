@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { appendAudit, addDecision, addRun, clearAll, getDataset, getMeta, getRun, listAudit, listDatasets, listDecisions, listRuleSets, listRunIndex, newId, putDataset, putRuleSet, ruleKey, setMeta, type Dataset, type RunIndex, type StoredRun } from '../storage/db';
+import { appendAudit, addDecision, addRun, clearAll, clearImportedData, getDataset, getMeta, getRun, listAudit, listDatasets, listDecisions, listRuleSets, listRunIndex, newId, putDataset, putRuleSet, ruleKey, setMeta, type Dataset, type RunIndex, type StoredRun } from '../storage/db';
 import { verifyChain, type ChainCheck } from '../audit/audit';
 import { assess, loadMemos } from '../engine/assess';
 import { parseLog, parseMaster } from '../engine/parse/records';
@@ -40,6 +40,7 @@ interface Actions {
   deactivateRule(key: string, reason: string): Promise<void>;
   loadRun(id: string): Promise<StoredRun | undefined>;
   refreshAudit(): Promise<void>;
+  resetImportedData(): Promise<void>;
   wipe(): Promise<void>;
 }
 
@@ -213,6 +214,14 @@ export const useStore = create<State & Actions>((set, get) => {
     async refreshAudit() {
       const entries = await listAudit();
       set({ audit: { count: entries.length, check: verifyChain(entries) } });
+    },
+
+    async resetImportedData() {
+      const before = get().dataset ? { datasetId: get().dataset!.id, datasets: get().datasets.length, runs: get().runs.length, decisions: get().decisions.length } : null;
+      await clearImportedData();
+      set({ dataset: null, datasets: [], memos: [], decisions: [], runs: [], current: null, busy: null, error: null });
+      await audit('DATA_RESET', 'imported data', before, null, 'Reset: imported files, assessment runs and review decisions cleared from this browser.');
+      await get().refreshAudit();
     },
 
     async wipe() {
