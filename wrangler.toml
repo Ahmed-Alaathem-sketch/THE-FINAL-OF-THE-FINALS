@@ -1,7 +1,7 @@
 # Cloudflare deployment (Free plan): a static single-page app served as Workers static assets.
 # No Worker script, no D1, no R2, no KV, no secrets: all data stays in the visitor's browser (IndexedDB).
 # `npx wrangler deploy` runs the build below, then uploads ./dist.
-name = "c5-risk-control-tower"
+name = "the-final-of-the-finals"
 compatibility_date = "2026-11-01"
 
 [build]

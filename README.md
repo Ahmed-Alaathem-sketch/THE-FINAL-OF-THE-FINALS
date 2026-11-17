@@ -213,12 +213,12 @@ The app is static: it needs **no Worker code, D1, R2 or KV, no environment varia
 1. **Merge the app into `main` first.** Cloudflare builds the production branch; before PR #1 was merged, `main` held only the README and zips, so there was nothing to build.
 2. Go to Cloudflare → **Workers & Pages → Create → Import a repository**, and choose `Ahmed-Alaathem-sketch/THE-FINAL-OF-THE-FINALS`.
 3. Use these settings:
-   - Project name: `c5-risk-control-tower`. It must match `name` in `wrangler.toml`.
+   - Project name: `the-final-of-the-finals`. It must match `name` in `wrangler.toml`.
    - Production branch: `main`.
    - Build command: *empty*, or `npm run build`.
    - Deploy command: `npx wrangler deploy`.
    - Root directory: `/`.
-4. Every push to `main` then builds and deploys to `https://c5-risk-control-tower.<your-subdomain>.workers.dev`. Non-production branches can get preview versions through the project's branch settings.
+4. Every push to `main` then builds and deploys to `https://the-final-of-the-finals.<your-subdomain>.workers.dev`. Non-production branches can get preview versions through the project's branch settings.
 
 ### Alternative: Pages project
 Use **Workers & Pages → Create → Pages → Connect to Git** with:
@@ -239,7 +239,7 @@ Use a token with the *Workers Scripts: Edit* permission only, and never commit i
 | Build log message | Cause | Fix |
 |---|---|---|
 | `No dependencies detected` followed by `Could not detect a directory containing static files` | The branch being built has no `package.json` or `wrangler.toml` (the app is not merged yet), or an old Pages-style `wrangler.toml` | Merge PR #1 into `main` (or build the `claude/…` branch); the current `wrangler.toml` has `[assets]` and a build command |
-| `The name in your wrangler.toml file (…) must match the name of your Worker` | The dashboard project name differs | Rename the project to `c5-risk-control-tower`, or change `name` in `wrangler.toml` |
+| `The name in your wrangler.toml file (…) must match the name of your Worker` | The dashboard project name differs | Set `name` in `wrangler.toml` to the dashboard project name (currently `the-final-of-the-finals`) |
 
 ### Free plan limits
 
